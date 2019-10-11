@@ -142,6 +142,7 @@ class MessageProcessor(object):
         processing and saved at a later stage.
         """
 
+        logger.info("\nUSER: {}\n".format(message.text))
         # preprocess message if necessary
         if self.message_preprocessor is not None:
             message.text = self.message_preprocessor(message.text)
