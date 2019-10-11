@@ -1,4 +1,5 @@
 import logging
+import json
 from copy import deepcopy
 from sanic import Blueprint, response
 from sanic.request import Request
@@ -175,6 +176,10 @@ class TelegramInput(InputChannel):
         return message.text
 
     @staticmethod
+    def _is_photo(message):
+        return message.photo 
+
+    @staticmethod
     def _is_button(update):
         return update.callback_query
 
@@ -218,6 +223,18 @@ class TelegramInput(InputChannel):
                         text = '{{"lng":{0}, "lat":{1}}}'.format(
                             msg.location.longitude, msg.location.latitude
                         )
+                    elif self._is_photo(msg):
+                        ff= msg.photo[-1].get_file()
+                        fsize= ff.file_size
+                        furl= str(ff.file_path)
+                        fid= ff.file_id 
+                        data= {
+                            "r_image_url": furl,
+                            "r_image_size": fsize,
+                            "r_image_id": fid 
+                        }
+                        text= "/receive_image{}".format(json.dumps(data))
+                        print("PHOTO_MSG : {}".format(text))
                     else:
                         return response.text("success")
                 sender_id = msg.chat.id
